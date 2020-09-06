@@ -1,6 +1,8 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <stdio.h>
+
 /*
 EBADF d is not a valid descriptor.
 EFAULT argp references an inaccessible memory area.
@@ -17,14 +19,19 @@ int stdout_ioctl (int __fd, unsigned long int __request, void *args)
         errno = ENOTTY;
         return -1;
 
+    p_winsize = (struct winsize*)args;
+
     switch (__request)
     {
         case TIOCGWINSZ:
-            p_winsize = (struct winsize*)args;
-            p_winsize-> ws_row = 0;
-            p_winsize-> ws_col = 0;
-            p_winsize-> ws_xpixel = 0;
-            p_winsize-> ws_ypixel = 0;
+            p_winsize->ws_col = 80;
+            p_winsize->ws_row = 24;
+            p_winsize->ws_xpixel = 0;/*unused*/
+            p_winsize->ws_ypixel = 0;/*unused*/
+            return 0;
+
+        case TIOCSWINSZ:
+            printf("\e[8;%d;%dt", p_winsize->ws_col, p_winsize->ws_row);
             return 0;
 
         default:
