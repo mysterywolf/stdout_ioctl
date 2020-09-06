@@ -33,7 +33,7 @@ int stdout_ioctl (int __fd, unsigned long int __request, void *args)
             return 0;
 
         case TIOCSWINSZ:
-            printf("\e[8;%d;%dt", p_winsize->ws_col, p_winsize->ws_row);
+            printf("\x1b[8;%d;%dt", p_winsize->ws_col, p_winsize->ws_row);
             return 0;
 
         default:
