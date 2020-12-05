@@ -3,19 +3,11 @@
 #include <errno.h>
 #include <stdio.h>
 
-/*
-EBADF d is not a valid descriptor.
-EFAULT argp references an inaccessible memory area.
-EINVAL Request or argp is not valid.
-ENOTTY d is not associated with a character special device.
-ENOTTY The specified request does not apply to the kind of object that the descriptor d references.
-*/
-
-int stdout_ioctl (int __fd, unsigned long int __request, void *args)
+int stdio_ioctl (int __fd, unsigned long int __request, void *args)
 {
     struct winsize* p_winsize;
 
-    if(__fd != STDOUT_FILENO)
+    if(__fd < 0 || __fd > 2)
     {
         errno = ENOTTY;
         return -1;
@@ -26,7 +18,7 @@ int stdout_ioctl (int __fd, unsigned long int __request, void *args)
     switch (__request)
     {
         case TIOCGWINSZ:
-            p_winsize->ws_col = 80;
+            p_winsize->ws_col = 80; /* TODO: get console size*/
             p_winsize->ws_row = 24;
             p_winsize->ws_xpixel = 0;/*unused*/
             p_winsize->ws_ypixel = 0;/*unused*/
