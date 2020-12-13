@@ -1137,6 +1137,7 @@ static rt_err_t rt_serial_control(struct rt_device *dev,
                 rt_kprintf("\x1b[18t"); 
 
                 /* receiving the report from terminal  */
+                /* 此处应该使用read函数， rt_device_read线程不安全且非阻塞*/
                 serial->parent.open_flag |= RT_DEVICE_FLAG_STREAM;
                 rn = rt_device_read(&serial->parent, 0, _tio_buf, _TIO_BUFLEN);
                 serial->parent.open_flag = old_flag;
