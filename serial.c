@@ -1128,13 +1128,13 @@ static rt_err_t rt_serial_control(struct rt_device *dev,
                 p_winsize = (struct winsize*)args;
                 rt_memset(_tio_buf,0,_TIO_BUFLEN); /* clear buffer */
 
-                /* sending the command to let terminal report the current area of text */
-                rt_kprintf("\x1b[18t"); 
-
                 /* suspend finsh thread */
             #ifdef RT_USING_FINSH
                 rt_thread_suspend(rt_thread_find(FINSH_THREAD_NAME));
             #endif
+
+                /* sending the command to let terminal report the current area of text */
+                rt_kprintf("\x1b[18t"); 
 
                 /* receiving the report from terminal  */
                 serial->parent.open_flag |= RT_DEVICE_FLAG_STREAM;
@@ -1146,6 +1146,12 @@ static rt_err_t rt_serial_control(struct rt_device *dev,
                 rt_thread_resume(rt_thread_find(FINSH_THREAD_NAME));
             #endif
 
+                /*已经确认若finsh不干扰，rt_device_read可以收到消息。不要将read到的消息直接打印到putty
+                putty是不会显示的，因为putty会视其为指令而非文本*/
+                
+                /*目前最大的问题是finsh会拦截rt_device_read想要收到的消息并直接显示到终端上*/
+                /* 在没有解决线程挂起bug之前，该问题没办法解决 */
+                
                 /*---后续处理，在此处分析收到的消息*/
 
                 //rt_kprintf("---\r\n%d\r\n----\r\n",rn);
